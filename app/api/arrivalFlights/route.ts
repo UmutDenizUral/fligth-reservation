@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import https from 'https';
-
+//Varış yeri Amsterdam olan veriler çekilir
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     console.log(searchParams)
@@ -10,7 +10,7 @@ export async function GET(req: Request) {
     const options = {
         method: 'GET',
         hostname: 'api.schiphol.nl',
-        path: `/public-flights/flights?flightDirection=A&includedelays=false&route=${from}&scheduleDate=${fromDate}&page=0&sort=%2BscheduleTime`, // Sorgu parametrelerini buraya ekle
+        path: `/public-flights/flights?flightDirection=A&includedelays=false&route=${from}&scheduleDate=${fromDate}&page=0&sort=%2BscheduleTime`,
         headers: {
             'resourceversion': 'v4',
             'app_id': 'b4cbaeb5',

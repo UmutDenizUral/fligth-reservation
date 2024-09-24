@@ -19,8 +19,8 @@ const SideCard: React.FC<SideCardProps> = ({ text, icon, backGroundImage = '/def
             <div className="relative grid grid-row-12 h-full">
                 <div className='row-span-11'></div>
                 <div className='row-span-1 bg-black bg-opacity-30 px-2'>
-                    <div className="text-white font-bold mx-auto">{icon}</div> {/* İkon */}
-                    <p className="text-white font-semibold mt-2">{text}</p> {/* Yazı */}
+                    <div className="text-white font-bold mx-auto">{icon}</div> 
+                    <p className="text-white font-semibold mt-2">{text}</p>
                 </div>
             </div>
         </div>

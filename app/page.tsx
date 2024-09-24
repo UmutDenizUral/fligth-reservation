@@ -8,7 +8,6 @@ import FlightFilter from './components/FlightFilter';
 
 const HomePage = () => {
   const [flights, setFlights] = useState([]); // Uçuş verilerini saklayacak state
-  console.log(flights)
   return (
     <div className="min-h-screen bg-purple-50">
       <div className="container px-4 mx-auto py-8 grid grid-cols-12 gap-8">
@@ -22,7 +21,7 @@ const HomePage = () => {
                   <FligthCard key={index} flight={flight} />
                 ))
               ) : (
-                <p>No flights available.</p>
+                <p className='p-2 bg-white rounded-md '>No flights available. Please select destinations and date</p>
               )}
             </div>
             {/* FlightFilter sadece görüntü için eklenmiştir */}

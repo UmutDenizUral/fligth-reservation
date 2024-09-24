@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import React from 'react'
 import SideCard from './SideCard'
 import { IoCarOutline } from "react-icons/io5";

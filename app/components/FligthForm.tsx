@@ -5,14 +5,16 @@ import { FaExchangeAlt } from "react-icons/fa";
 import { ıataData } from '../constants/airportData';
 import { LuPlaneTakeoff } from "react-icons/lu";
 import { LuPlaneLanding } from "react-icons/lu";
-
 import { IoAirplane } from "react-icons/io5";
+import toast from 'react-hot-toast';
+
 const FlightForm = ({ setFlights }: any) => { // setFlights fonksiyonunu prop olarak alıyoruz
     const [from, setFrom] = useState<string | undefined>('');
     const [to, setTo] = useState<string | undefined>('AMS');
-    const [date, setDate] = useState('');
-    const [route, setRoute] = useState(false);
+    const [date, setDate] = useState<any>('');
+    const [route, setRoute] = useState<boolean>(false);
 
+    //Form verileri için lokasyon değiştirir
     const swapLocations = () => {
         if (route) {
             setTo('AMS');
@@ -28,6 +30,7 @@ const FlightForm = ({ setFlights }: any) => { // setFlights fonksiyonunu prop ol
         e.preventDefault();
 
         if (from && to) {
+            toast.success('Uçuşlar bulunuyor')
             try {
                 const endpoint = from === 'AMS' ? '/api/depatureFlights' : '/api/arrivalFlights';
                 const params = from === 'AMS' ? { to, date } : { from, date };
@@ -55,10 +58,9 @@ const FlightForm = ({ setFlights }: any) => { // setFlights fonksiyonunu prop ol
                                 type="text"
                                 placeholder="To"
                                 className="bg-white p-2 rounded-md w-full"
-                                value={'AMS'}
+                                value={'AMS- Amsterdam Schiphol'}
                                 disabled
                             /></div>
-
                     ) : (
                         <div className='w-1/3 flex items-center justify-center border p-1 rounded-md'>
                             <span className='text-purple-900'><LuPlaneTakeoff size={20} /></span>
@@ -76,7 +78,6 @@ const FlightForm = ({ setFlights }: any) => { // setFlights fonksiyonunu prop ol
                                     </option>
                                 ))}
                             </select></div>
-
                     )}
                     <button
                         type="button"
@@ -87,7 +88,7 @@ const FlightForm = ({ setFlights }: any) => { // setFlights fonksiyonunu prop ol
                     </button>
                     {route ? (
                         <div className='w-1/3 flex items-center justify-center border p-1 rounded-md'>
-                        <span className='text-purple-900'><LuPlaneLanding size={20} /></span>
+                            <span className='text-purple-900'><LuPlaneLanding size={20} /></span>
                             <select
                                 required
                                 value={to}
@@ -102,19 +103,17 @@ const FlightForm = ({ setFlights }: any) => { // setFlights fonksiyonunu prop ol
                                 ))}
                             </select>
                         </div>
-
                     ) : (
                         <div className='w-1/3 flex items-center justify-center border p-1 rounded-md'>
-                              <span className='text-purple-900'><LuPlaneLanding size={20} /></span>
-                             <input
-                            type="text"
-                            placeholder="From"
-                            className="bg-white p-2 rounded-md w-full"
-                            value={'AMS'}
-                            disabled
-                        />
+                            <span className='text-purple-900'><LuPlaneLanding size={20} /></span>
+                            <input
+                                type="text"
+                                placeholder="From"
+                                className="bg-white p-2 rounded-md w-full"
+                                value={'AMS- Amsterdam Schiphol'}
+                                disabled
+                            />
                         </div>
-                       
                     )}
                     <input
                         required

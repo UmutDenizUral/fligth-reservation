@@ -1,23 +1,71 @@
-import React from 'react';
-import { LuPlaneTakeoff } from "react-icons/lu";
-import { LuPlaneLanding } from "react-icons/lu";
+import React, { useState } from 'react';
+import { LuPlaneTakeoff, LuPlaneLanding } from "react-icons/lu";
 import { IoAirplaneSharp } from "react-icons/io5";
 import { ıataData } from '../constants/airportData';
+import axios from 'axios';
+import toast from 'react-hot-toast';
 
-const FligthCard = ({ flight }: any) => {
-    // Uçuşun kalkış ve iniş zamanını hesaplayabilmek için Date objeleri oluştur
-    const departureTime = new Date(flight.scheduleDateTime);
-    const landingTime = new Date(flight.estimatedLandingTime == undefined ? flight.scheduleDateTime : flight.estimatedLandingTime);
+//ıata havayolu adına çeviren fonksiyon
+export function handleIATA(iataCode: string) {
+    const airport = ıataData.find(airport => airport.iata === iataCode);
+    return airport ? airport.city : "City not found";
+}
 
-    function handleIATA(iataCode: string) {
-        // Dizideki her bir elemanı kontrol eder
-        const airport = ıataData.find(airport => airport.iata === iataCode);
-
-        // Eğer eşleşen bir iata kodu varsa şehir döner, yoksa undefined döner
-        return airport ? airport.city : "City not found";
+type FlightProps = {
+    flight: {
+        apiID: string;
+        flightName: string;
+        flightNumber: string | number;
+        prefixICAO: string;
+        scheduleDateTime: string;
+        estimatedLandingTime: string;
+        flightDirection: string;
+        route: {
+            destinations: string[];
+        };
+        price: number; 
     }
+}
 
-    // Uçuş süresi
+const FlightCard = ({ flight }: FlightProps) => {
+    const departureTime = new Date(flight.scheduleDateTime);
+    const landingTime = new Date(flight.estimatedLandingTime || flight.scheduleDateTime);
+    
+    const [flightBookingData, setFlightBookingData] = useState({
+        apiID: flight.apiID,
+        flightName: flight.flightName,
+        flightNumber: flight.flightNumber,
+        prefixICAO: flight.prefixICAO,
+        scheduleDateTime: flight.scheduleDateTime,
+        estimatedLandingTime: flight.estimatedLandingTime,
+        flightDirection: flight.flightDirection,
+        route: flight.route.destinations[flight.route.destinations.length - 1]
+    });
+
+    //Verileri database kaydeden fonksiyon
+    const bookFlight = () => {
+        if (flightBookingData) {
+            const currentDateTime = new Date();
+            if (flight.scheduleDateTime) {
+                const scheduledDateTime = new Date(flight.scheduleDateTime);
+                if (scheduledDateTime >= currentDateTime) {
+                    toast.success('Rezervasyon kaydı yapılıyor');
+                    axios.post('/api/saveFlight', flightBookingData)
+                        .then(() => {
+                            toast.success('Rezervasyon yapılmıştır');
+                        })
+                        .catch((error) => {
+                            alert(error);
+                            console.log(error, "error");
+                        });
+                } else {
+                    toast.error('Seçilen tarih geçmişte, işlem yapılamaz.');
+                }
+            }
+            console.log(flightBookingData);
+        }
+    };
+
     const flightDuration = Math.abs(landingTime.getTime() - departureTime.getTime()) / (1000 * 60); // Dakika cinsinden
 
     return (
@@ -37,7 +85,7 @@ const FligthCard = ({ flight }: any) => {
                         <div className="text-center">
                             <p>{flight.prefixICAO}</p>
                             <p className='text-purple-900 flex items-center justify-center my-1'><IoAirplaneSharp size={25} /></p>
-                            <p className="text-sm text-gray-500">{flightDuration} minutes</p>
+                            <p className="text-sm text-gray-500">{flightDuration.toFixed()} minutes</p>
                         </div>
                         <div className='flex items-center justify-center'>
                             <p className='w-8 md:w-16 h-0.5 bg-gray-400'></p>
@@ -54,15 +102,13 @@ const FligthCard = ({ flight }: any) => {
                         </div>
                         <div className="absolute bottom-0 right-0">
                             <p className="font-bold text-lg">{flight.price}</p>
-                            <button className="bg-purple-900 text-white px-5 py-3 rounded-md">
+                            <button onClick={bookFlight} className="bg-purple-900 text-white px-5 py-3 rounded-md">
                                 Book Flight
                             </button>
                         </div>
                     </div>
-
                 </div>
             ) : (
-
                 <div>
                     <div className='font-bold'>Amsterdam-{handleIATA(flight.route.destinations[flight.route.destinations.length - 1])}</div>
                     <div className='flex justify-between items-center my-2'>
@@ -77,7 +123,7 @@ const FligthCard = ({ flight }: any) => {
                         <div className="text-center">
                             <p>{flight.prefixICAO}</p>
                             <p className='text-purple-900 flex items-center justify-center my-1'><IoAirplaneSharp size={25} /></p>
-                            <p className="text-sm text-gray-500">{flightDuration} minutes</p>
+                            <p className="text-sm text-gray-500">{flightDuration.toFixed()} minutes</p>
                         </div>
                         <div className='flex items-center justify-center'>
                             <p className='w-8 md:w-16 h-0.5 bg-gray-400'></p>
@@ -86,25 +132,23 @@ const FligthCard = ({ flight }: any) => {
                             <p className='flex items-center justify-start gap-2 text-gray-600'><LuPlaneLanding /> Arrival</p>
                             <p className=" font-bold">{landingTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</p>
                             <p className="text-sm text-gray-500">Airport: {flight.route.destinations[flight.route.destinations.length - 1]}</p>
-
                         </div>
                     </div>
                     <div className='flex mt-4'>
-                    <div className='flex items-center justify-center text-purple-700 font-bold'>
+                        <div className='flex items-center justify-center text-purple-700 font-bold'>
                             Price: ${Math.floor(Math.random() * (500 - 100 + 1)) + 100}
                         </div>
                         <div className="absolute bottom-0 right-0">
                             <p className="font-bold text-lg">{flight.price}</p>
-                            <button className="bg-purple-900 text-white px-5 py-3 rounded-md">
+                            <button onClick={bookFlight} className="bg-purple-900 text-white px-5 py-3 rounded-md">
                                 Book Flight
                             </button>
                         </div>
                     </div>
-
                 </div>
             )}
         </div>
     );
 }
 
-export default FligthCard;
+export default FlightCard;
